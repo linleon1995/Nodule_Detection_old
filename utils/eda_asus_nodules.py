@@ -10,7 +10,7 @@ from medical_image_process import load_itk
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from skimage import measure, feature
 from pprint import pprint
-from eda_utils import process_asus_nodules_label
+from eda_utils import process_asus_nodules_label, display_compare
 
 
 class ASUS_modules_statistics(object):
@@ -72,6 +72,31 @@ class ASUS_modules_visualize(object):
             ct_scan, _, _ = load_itk(mask_path)
             process_asus_nodules_label(ct_scan, save_name=os.path.split(mask_dir)[1], save_path=rf'C:\Users\test\Desktop\Leon\Weekly\1126\label')
 
+    def batch_compare(self):
+        data_dir = dataset_utils.get_files(self.root, '1m00', recursive=False, get_dirs=True)
+        for _dir in data_dir:
+            img_dir = dataset_utils.get_files(_dir, 'raw', get_dirs=True)
+            mask_dir = dataset_utils.get_files(_dir, 'mask', get_dirs=True)
+            if len(img_dir) > 0 and len(mask_dir) > 0:
+                img_dir = img_dir[0]
+                mask_dir = mask_dir[0]
+                img_path = dataset_utils.get_files(img_dir, 'mhd')
+                mask_path = dataset_utils.get_files(mask_dir, 'mhd')
+                if len(img_path) > 0 and len(mask_path) > 0:
+                    img_path = img_path[0]
+                    mask_path = mask_path[0]
+                    ct_scan, _, _ = load_itk(img_path)
+                    ct_scan_mask, _, _ = load_itk(mask_path)
+                    if ct_scan_mask.shape[0] == ct_scan.shape[0]:
+                        display_compare(ct_scan, 
+                                        ct_scan_mask, 
+                                        save_path=rf'C:\Users\test\Desktop\Leon\Weekly\1126\compare2', \
+                                        save_name=os.path.split(mask_dir)[1],
+                                        alpha=0.2,)
+                    else:
+                        print("---UM:", os.path.split(mask_dir)[1])
+                    # process_asus_nodules_label(ct_scan, save_name=os.path.split(mask_dir)[1], save_path=rf'C:\Users\test\Desktop\Leon\Weekly\1126\label')
+
 
 if __name__ == '__main__':
     # data_path = rf'C:\Users\test\Desktop\Leon\Datasets\ASUS_Nodules\benign\0017207\0017207mask'
@@ -89,6 +114,7 @@ if __name__ == '__main__':
     path = rf'C:\Users\test\Desktop\Leon\Datasets\ASUS_Nodules\malignant\1m0010'
     path = rf'C:\Users\test\Desktop\Leon\Datasets\ASUS_Nodules\malignant'
     data_vis = ASUS_modules_visualize(path)
-    data_vis.process_mask()
+    data_vis.batch_compare()
+    # data_vis.process_mask()
 
     # data_stats = ASUS_modules_statistics(data_path)

@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def process_hu_value(img, low_cut_off):
+    img = np.where(img<low_cut_off, 0, img)
+    return img
 
 def load_itk(filename):
     '''
