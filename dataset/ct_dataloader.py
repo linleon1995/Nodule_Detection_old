@@ -6,9 +6,9 @@ import pandas as pd
 import sys
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 from dataset.data_utils import load_itk
 from dataset import ct_preprocess
-sys.path.append("..")
 from modules.data import BaseDataloader
 from modules.data import dataset_utils
 
@@ -85,7 +85,7 @@ class DatasetFolder(Dataset):
     """
 
     def __init__(self, root, loader, extensions, label_root=None, transform=None):
-        samples = data_utils.get_files(root, keys=extensions)
+        samples = dataset_utils.get_files(root, keys=extensions)
 
         if len(samples) == 0:
             raise (RuntimeError("Found 0 files in subfolders of: " + root + "\n" +
@@ -98,7 +98,7 @@ class DatasetFolder(Dataset):
 
         self.samples = samples
         if self.label_root:
-            self.labels = data_utils.get_files(label_root, keys=extensions)
+            self.labels = dataset_utils.get_files(label_root, keys=extensions)
 
         self.transform = transform
 

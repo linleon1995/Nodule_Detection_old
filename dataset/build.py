@@ -74,7 +74,7 @@ def build_loader(config):
 
 def build_dataset(is_train, config):
     transform = build_transform(is_train, config)
-    dataset = ct_dataloader.DatasetFolder(config.DATA.DATA_PATH, loader=sample_slice_from_ct, 
+    dataset = ct_dataloader.DatasetFolder(config.DATA.DATA_PATH, loader=np.load, 
                                           extensions=config.DATA.EXTENSIONS, label_root=config.DATA.LABEL_PATH, transform=transform)
 
     # transform = build_transform(is_train, config)

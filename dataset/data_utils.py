@@ -1,7 +1,7 @@
 import SimpleITK as sitk
 import numpy as np
 import matplotlib.pyplot as plt
-
+# TODO: to a single object
 
 def process_hu_value(img, low_cut_off=None, high_cut_off=None):
     if low_cut_off is not None:
@@ -35,13 +35,3 @@ def sample_slice_from_ct(path):
     ct_scan, _, _ = load_itk(path)
     slice_idx = np.random.choice(np.arange(ct_scan.shape[0]))
     return ct_scan[slice_idx]
-
-
-if __name__ == '__main__':
-    # filename = rf'C:\Users\test\Desktop\Leon\Datasets\LUNA16\subset0\1.3.6.1.4.1.14519.5.2.1.6279.6001.105756658031515062000744821260.mhd'
-    # ct_scan, origin, spacing = load_itk(filename)
-    # for scan in ct_scan:
-    #     plt.imshow(scan, 'gray')
-    #     plt.show()
-    # print(3)
-    pass
