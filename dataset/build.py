@@ -9,7 +9,17 @@ from timm.data import create_transform
 from timm.data.transforms import _pil_interp
 
 from dataset import ct_dataloader
-from dataset.data_utils import sample_slice_from_ct
+from dataset import data_utils
+
+from modules.data import dataset_utils
+
+
+def build_input_cases(root, split):
+    input_cases = dataset_utils.get_files(root, return_fullpath=False, recursive=False, get_dirs=True)
+    train_cases = input_cases[:int(split*len(input_cases))]
+    valid_cases = list(set(input_cases)-set(train_cases))
+    return train_cases, valid_cases
+
 
 def build_loader(config):
     # TODO: check code +++
@@ -20,8 +30,9 @@ def build_loader(config):
     # dataset_val, _ = build_dataset(is_train=False, config=config)
     # print(f"local rank {config.LOCAL_RANK} / global rank {dist.get_rank()} successfully build val dataset")
 
-    dataset_train = build_dataset(is_train=True, config=config)
-    dataset_val = build_dataset(is_train=False, config=config)
+    train_cases, valid_cases = build_input_cases(config.DATA.DATA_PATH, split=config.TRAIN.SPLIT)
+    dataset_train = build_dataset(is_train=config.AUG.IS_DATA_AUGMENTATION , config=config, input_cases=train_cases)
+    dataset_val = build_dataset(is_train=False, config=config, input_cases=valid_cases)
     #  +++
 
     # TODO: check code +++
@@ -72,10 +83,11 @@ def build_loader(config):
     return dataset_train, dataset_val, data_loader_train, data_loader_val, mixup_fn
 
 
-def build_dataset(is_train, config):
+def build_dataset(is_train, config, input_cases):
     transform = build_transform(is_train, config)
-    dataset = ct_dataloader.DatasetFolder(config.DATA.DATA_PATH, loader=np.load, 
-                                          extensions=config.DATA.EXTENSIONS, label_root=config.DATA.LABEL_PATH, transform=transform)
+    dataset = ct_dataloader.DatasetFolder(config.DATA.DATA_PATH, loader=data_utils.convert_npy_to_pil, 
+                                          extensions=config.DATA.EXTENSIONS, input_cases=input_cases,
+                                          label_root=config.DATA.LABEL_PATH, transform=transform)
 
     # transform = build_transform(is_train, config)
     # if config.DATA.DATASET == 'imagenet':
@@ -112,13 +124,15 @@ def build_transform(is_train, config):
         if not resize_im:
             # replace RandomResizedCropAndInterpolation with
             # RandomCrop
-            transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=4)
+            transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=None)
+            # transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=4)
         return transform
 
     t = []
     if resize_im:
         if config.TEST.CROP:
-            size = int((256 / 224) * config.DATA.IMG_SIZE)
+            # size = int((256 / 224) * config.DATA.IMG_SIZE)
+            size = config.DATA.IMG_SIZE
             t.append(
                 transforms.Resize(size, interpolation=_pil_interp(config.DATA.INTERPOLATION)),
                 # to maintain same ratio w.r.t. 224 images
@@ -131,5 +145,5 @@ def build_transform(is_train, config):
             )
 
     t.append(transforms.ToTensor())
-    t.append(transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD))
+    # t.append(transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD))
     return transforms.Compose(t)

@@ -21,7 +21,7 @@ _C.DATA.LABEL_PATH = ''
 # Dataset name
 _C.DATA.DATASET = 'imagenet'
 # Input image size
-_C.DATA.IMG_SIZE = 224
+_C.DATA.IMG_SIZE = 256
 # Interpolation to resize image (random, bilinear, bicubic)
 _C.DATA.INTERPOLATION = 'bicubic'
 # Use zipped dataset instead of folder dataset
@@ -34,7 +34,7 @@ _C.DATA.PIN_MEMORY = True
 # Number of data loading threads
 _C.DATA.NUM_WORKERS = 0
 # Accepted input extensions
-_C.DATA.EXTENSIONS = ['mhd']
+_C.DATA.EXTENSIONS = ['mhd', 'npy']
 
 # -----------------------------------------------------------------------------
 # Model settings
@@ -98,6 +98,7 @@ _C.TRAIN.BASE_LR = 5e-4
 _C.TRAIN.WARMUP_LR = 5e-7
 _C.TRAIN.MIN_LR = 5e-6
 _C.TRAIN.CHECKPOINT_SAVING_STEPS = 100
+_C.TRAIN.SPLIT = 0.8
 # Clip gradient norm
 _C.TRAIN.CLIP_GRAD = 5.0
 # Auto resume from latest checkpoint

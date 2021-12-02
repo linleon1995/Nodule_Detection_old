@@ -62,6 +62,20 @@ class NoduleImageSegDataset(BaseDataloader.ImageDataset):
             return image
 
 
+def make_datasets(root, extensions, input_cases, label_root=None):
+    samples, targets = [], []
+    for case in input_cases:
+        samples.extend(dataset_utils.get_files(os.path.join(root, case), keys=extensions))
+        if label_root:
+            targets.extend(dataset_utils.get_files(os.path.join(label_root, case), keys=extensions))
+
+    samples.sort()
+    if targets: 
+        targets.sort()
+        assert len(samples) == len(targets), f'Unmatching sample number between input {len(samples)} and target: {len(targets)}'
+    return samples, targets
+
+
 class DatasetFolder(Dataset):
     # TODO: change descriptions
     """A generic data loader where the samples are arranged in this way: ::
@@ -84,21 +98,18 @@ class DatasetFolder(Dataset):
         samples (list): List of (sample path, class_index) tuples
     """
 
-    def __init__(self, root, loader, extensions, label_root=None, transform=None):
-        samples = dataset_utils.get_files(root, keys=extensions)
-
+    def __init__(self, root, loader, extensions, input_cases, label_root=None, transform=None):
+        samples, targets = make_datasets(root, extensions, input_cases, label_root)
         if len(samples) == 0:
             raise (RuntimeError("Found 0 files in subfolders of: " + root + "\n" +
                                 "Supported extensions are: " + ",".join(extensions)))
+        self.samples = samples
+        self.targets = targets
 
         self.root = root
         self.label_root = label_root
         self.loader = loader
         self.extensions = extensions
-
-        self.samples = samples
-        if self.label_root:
-            self.labels = dataset_utils.get_files(label_root, keys=extensions)
 
         self.transform = transform
 
@@ -111,13 +122,13 @@ class DatasetFolder(Dataset):
         """
         path = self.samples[index]
         sample = self.loader(path)
-        if self.label_root:
-            label_path = self.labels[index]
-            target = self.loader(label_path)
+        if self.targets:
+            target_path = self.targets[index]
+            target = self.loader(target_path)
 
         if self.transform is not None:
             sample = self.transform(sample)
-            if self.label_root:
+            if self.targets:
                 target = self.transform(target)
             else:
                 return sample

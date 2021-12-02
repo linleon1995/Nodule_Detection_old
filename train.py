@@ -12,7 +12,9 @@ from config import get_config
 CONFIG_PATH = rf'C:\Users\test\Desktop\Leon\Projects\Nodule_Detection\configs\_cnn_train_config.yml'
 # sys.path.append("...")
 
-from modules.model import img_classifier
+from modules.model.image_calssification import img_classifier
+from modules.model.unet import unet_2d
+from modules.model import layers
 from modules.train import trainer
 from modules.utils import train_utils
 from modules.utils import configuration
@@ -92,9 +94,12 @@ def main(config):
     train_utils.config_logging(os.path.join(checkpoint_path, 'logging.txt'), config, access_mode='w+')
 
     # Model
-    model = img_classifier.ImageClassifier(
-        backbone=config.MODEL.NAME, in_channels=config.MODEL.IN_CHANNELS, activation=config.MODEL.ACTIVATION,
-        out_channels=config.MODEL.NUM_CLASSES, pretrained=config.TRAIN.USE_CHECKPOINT, dim=1, output_structure=None)
+    # model = img_classifier.ImageClassifier(
+    #     backbone=config.MODEL.NAME, in_channels=config.MODEL.IN_CHANNELS, activation=config.MODEL.ACTIVATION,
+    #     out_channels=config.MODEL.NUM_CLASSES, pretrained=config.TRAIN.USE_CHECKPOINT, dim=1, output_structure=None)
+    f_maps = [64, 256, 512, 1024, 2048]
+    model = unet_2d.UNet_2d_backbone(
+        in_channels=config.MODEL.IN_CHANNELS, out_channels=config.MODEL.NUM_CLASSES, f_maps=f_maps, basic_module=layers.DoubleConv, pretrained=config.TRAIN.USE_CHECKPOINT)
 
     # Optimizer
     optimizer = train_utils.create_optimizer(config, model)

@@ -1,6 +1,7 @@
 import SimpleITK as sitk
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 # TODO: to a single object
 
 def process_hu_value(img, low_cut_off=None, high_cut_off=None):
@@ -35,3 +36,9 @@ def sample_slice_from_ct(path):
     ct_scan, _, _ = load_itk(path)
     slice_idx = np.random.choice(np.arange(ct_scan.shape[0]))
     return ct_scan[slice_idx]
+
+
+def convert_npy_to_pil(path):
+    array = np.load(path)
+    image = Image.fromarray(array)
+    return image
