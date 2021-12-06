@@ -53,6 +53,7 @@ def build_loader(config):
     data_loader_train = torch.utils.data.DataLoader(
         dataset_train, 
         # sampler=sampler_train,
+        shuffle=True,
         batch_size=config.DATA.BATCH_SIZE,
         num_workers=config.DATA.NUM_WORKERS,
         pin_memory=config.DATA.PIN_MEMORY,
@@ -109,24 +110,24 @@ def build_dataset(is_train, config, input_cases):
 
 def build_transform(is_train, config):
     resize_im = config.DATA.IMG_SIZE > 32
-    if is_train:
-        # this should always dispatch to transforms_imagenet_train
-        transform = create_transform(
-            input_size=config.DATA.IMG_SIZE,
-            is_training=True,
-            color_jitter=config.AUG.COLOR_JITTER if config.AUG.COLOR_JITTER > 0 else None,
-            auto_augment=config.AUG.AUTO_AUGMENT if config.AUG.AUTO_AUGMENT != 'none' else None,
-            re_prob=config.AUG.REPROB,
-            re_mode=config.AUG.REMODE,
-            re_count=config.AUG.RECOUNT,
-            interpolation=config.DATA.INTERPOLATION,
-        )
-        if not resize_im:
-            # replace RandomResizedCropAndInterpolation with
-            # RandomCrop
-            transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=None)
-            # transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=4)
-        return transform
+    # if is_train:
+    #     # this should always dispatch to transforms_imagenet_train
+    #     transform = create_transform(
+    #         input_size=config.DATA.IMG_SIZE,
+    #         is_training=True,
+    #         color_jitter=config.AUG.COLOR_JITTER if config.AUG.COLOR_JITTER > 0 else None,
+    #         auto_augment=config.AUG.AUTO_AUGMENT if config.AUG.AUTO_AUGMENT != 'none' else None,
+    #         re_prob=config.AUG.REPROB,
+    #         re_mode=config.AUG.REMODE,
+    #         re_count=config.AUG.RECOUNT,
+    #         interpolation=config.DATA.INTERPOLATION,
+    #     )
+    #     if not resize_im:
+    #         # replace RandomResizedCropAndInterpolation with
+    #         # RandomCrop
+    #         transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=None)
+    #         # transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=4)
+    #     return transform
 
     t = []
     if resize_im:

@@ -13,7 +13,7 @@ _C.BASE = ['']
 # -----------------------------------------------------------------------------
 _C.DATA = CN()
 # Batch size for a single GPU, could be overwritten by command line argument
-_C.DATA.BATCH_SIZE = 2
+_C.DATA.BATCH_SIZE = 8
 # Path to dataset, could be overwritten by command line argument
 _C.DATA.DATA_PATH = ''
 # Path to dataset label, could be overwritten by command line argument
@@ -49,7 +49,7 @@ _C.MODEL.RESUME = ''
 # Number of input image channel
 _C.MODEL.IN_CHANNELS = 1
 # Number of classes, overwritten in data preparation
-_C.MODEL.NUM_CLASSES = 2
+_C.MODEL.NUM_CLASSES = 1
 # Dropout rate
 _C.MODEL.DROP_RATE = 0.0
 # Drop path rate
@@ -94,7 +94,7 @@ _C.TRAIN.START_EPOCH = 0
 _C.TRAIN.EPOCH = 10
 _C.TRAIN.WARMUP_EPOCHS = 20
 _C.TRAIN.WEIGHT_DECAY = 0.05
-_C.TRAIN.BASE_LR = 5e-4
+_C.TRAIN.BASE_LR = 5e-3
 _C.TRAIN.WARMUP_LR = 5e-7
 _C.TRAIN.MIN_LR = 5e-6
 _C.TRAIN.CHECKPOINT_SAVING_STEPS = 100

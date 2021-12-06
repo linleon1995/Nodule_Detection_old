@@ -69,9 +69,11 @@ def main():
     filename = rf'C:\Users\test\Desktop\Leon\Datasets\LUNA16\seg-lungs-LUNA16'
     d = rf'C:\Users\test\Desktop\Leon\Datasets\LIDC-IDRI\LIDC-IDRI-1009\01-01-2000-CT THORAX WCONTRAST-88101\3.000000-Recon 2 CHEST-38044\1-106.dcm'
     d = rf'C:\Users\test\Desktop\Leon\Datasets\LIDC-IDRI\LIDC-IDRI-0219\01-01-2000-CHEST PA  LATERAL-55820\3186.000000-74714\1-1.dcm'
+    d = rf'C:\Users\test\Documents\Data\0060025raw\xx\1.2.826.0.1.3680043.2.1125.1.35942010135160686276394666321214367.mhd'
     image = load_itk(d)
-    plt.imshow(image[0][0])
-    plt.show()
+    for scan in image[0]:
+        plt.imshow(scan, 'gray')
+        plt.show()
 
 
     for f_idx, f in enumerate(dataset_utils.get_files(filename, ['mhd'])):
@@ -95,5 +97,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    test('LIDC-IDRI-0079')
+    main()
+    # test('LIDC-IDRI-0079')

@@ -2,6 +2,7 @@ import sys
 import os
 import torch
 import numpy as np
+import tensorboardX
 import random
 import argparse
 from pprint import pprint
@@ -98,6 +99,7 @@ def main(config):
     #     backbone=config.MODEL.NAME, in_channels=config.MODEL.IN_CHANNELS, activation=config.MODEL.ACTIVATION,
     #     out_channels=config.MODEL.NUM_CLASSES, pretrained=config.TRAIN.USE_CHECKPOINT, dim=1, output_structure=None)
     f_maps = [64, 256, 512, 1024, 2048]
+    f_maps = [64, 256, 512]
     model = unet_2d.UNet_2d_backbone(
         in_channels=config.MODEL.IN_CHANNELS, out_channels=config.MODEL.NUM_CLASSES, f_maps=f_maps, basic_module=layers.DoubleConv, pretrained=config.TRAIN.USE_CHECKPOINT)
 
@@ -107,6 +109,7 @@ def main(config):
     # Criterion (Loss function)
     def criterion_wrap(outputs, labels):
         criterion = train_utils.create_criterion(config.TRAIN.LOSS)
+        # TODO: loss = criterion(outputs, torch.argmax(labels.long(), axis=1))
         if isinstance(criterion, torch.nn.CrossEntropyLoss):
             loss = criterion(outputs, torch.argmax(labels.long(), axis=1))
         else:
@@ -115,7 +118,10 @@ def main(config):
     # criterion = train_utils.create_criterion(config.train.loss)
 
     # Final activation
-    activation_func = train_utils.create_activation(config.MODEL.ACTIVATION)
+    if config.MODEL.ACTIVATION:
+        activation_func = train_utils.create_activation(config.MODEL.ACTIVATION)
+    else:
+        activation_func = None
 
     # Training
     trainer_instance = trainer.Trainer(config,
